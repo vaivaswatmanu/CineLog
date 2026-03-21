@@ -1,0 +1,74 @@
+<template>
+    <div class="chat-overlay" onclick={handleOverlayClick}>
+        <div class="chat-panel" onclick={stopProp}>
+
+            <!-- ── Header ── -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="ai-avatar">🤖</div>
+                    <div>
+                        <div class="chat-title">CineLog AI</div>
+                        <div class="chat-subtitle">Your personal movie advisor</div>
+                    </div>
+                </div>
+                <button class="chat-close" onclick={handleClose}>✕</button>
+            </div>
+
+            <!-- ── Messages ── -->
+            <div class="chat-messages" lwc:ref="messageContainer">
+
+                <!-- Welcome message -->
+                <div class="message ai-message">
+    <div class="message-bubble">
+        🎬 Greetings, <strong>Men of Culture</strong>. I've studied your watchlist and I know your taste. What cinematic wisdom do you seek?
+        <ul class="suggestion-list">
+            <li onclick={handleSuggestionClick} data-msg="What should I watch tonight?">💡 What should I watch tonight?</li>
+            <li onclick={handleSuggestionClick} data-msg="Suggest something based on my GOAT rated movies">🐐 Based on my GOAT movies</li>
+            <li onclick={handleSuggestionClick} data-msg="Suggest a good thriller I haven't seen">🎬 Suggest a thriller</li>
+            <li onclick={handleSuggestionClick} data-msg="What's a good movie for a sad mood?">😔 Something for a sad mood</li>
+        </ul>
+    </div>
+</div>
+
+                <!-- Chat history -->
+                <template for:each={messages} for:item="msg">
+                    <div key={msg.id} class={msg.wrapClass}>
+                        <div class="message-bubble">{msg.text}</div>
+                        <div class="message-time">{msg.time}</div>
+                    </div>
+                </template>
+
+                <!-- Typing indicator -->
+                <template if:true={isTyping}>
+                    <div class="message ai-message">
+                        <div class="message-bubble typing-bubble">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+
+            <!-- ── Input ── -->
+            <div class="chat-input-wrap">
+                <input
+                    type="text"
+                    class="chat-input"
+                    placeholder="Ask me anything about movies..."
+                    value={inputText}
+                    oninput={handleInput}
+                    onkeyup={handleKeyUp}
+                    disabled={isTyping} />
+                <button
+                    class="chat-send-btn"
+                    onclick={handleSend}
+                    disabled={isTyping}>
+                    {isTyping ? '...' : '→'}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</template>

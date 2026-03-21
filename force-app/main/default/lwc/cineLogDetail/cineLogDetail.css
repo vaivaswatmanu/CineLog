@@ -1,0 +1,171 @@
+.overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.detail-panel {
+    background: #fff;
+    border-radius: 16px;
+    width: 680px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.backdrop {
+    position: relative;
+    height: 280px;
+    background: #1a1a2e;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+}
+
+.backdrop-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+}
+
+.backdrop-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 20px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+}
+
+.detail-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.detail-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    color: #ccc;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.type-badge {
+    background: #0070d2;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.detail-genres {
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+.tv-info {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.tv-stat {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    border-right: 1px solid #e9ecef;
+}
+
+.tv-stat:last-child { border-right: none; }
+
+.tv-stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #706e6b;
+    margin-bottom: 4px;
+}
+
+.tv-stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #032d60;
+}
+
+.detail-section {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.detail-overview {
+    font-size: 0.9rem;
+    color: #3e3e3c;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.log-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+}
+
+.ai-text, .review-text {
+    font-size: 0.88rem;
+    color: #3e3e3c;
+    line-height: 1.6;
+    margin: 0;
+}

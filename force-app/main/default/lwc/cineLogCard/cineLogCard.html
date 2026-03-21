@@ -1,0 +1,79 @@
+<template>
+    <div class="card">
+
+        <!-- ── Top: Poster + Info ── -->
+        <div class="card-top" onclick={handleCardClick} style="cursor:pointer;">
+            <div class="poster-wrap">
+                <template if:true={movie.Poster_URL__c}>
+                    <img src={movie.Poster_URL__c} alt={movie.Title__c} class="poster" />
+                </template>
+                <template if:false={movie.Poster_URL__c}>
+                    <div class="no-poster">🎬</div>
+                </template>
+            </div>
+            <div class="card-info">
+                <div class="card-title">{movie.Title__c}</div>
+                <div class="card-meta">{movie.Release_Date__c}</div>
+                <div class="card-genres">{movie.Genres__c}</div>
+                <div class="status-badge" data-status={movie.Status__c}>{movie.Status__c}</div>
+                <template if:true={movie.My_Rating__c}>
+                    <div class="my-rating">⭐ My Rating: {movie.My_Rating__c} / 10</div>
+                </template>
+                <div class="card-overview">{movie.Overview__c}</div>
+            </div>
+        </div>
+
+        <!-- ── Log Form ── -->
+        <div class="log-form">
+            <lightning-combobox
+                label="Status"
+                value={status}
+                options={statusOptions}
+                onchange={handleStatusChange}>
+            </lightning-combobox>
+            <lightning-input
+                type="number"
+                label="My Rating (0–10)"
+                min="0" max="10" step="0.5"
+                value={myRating}
+                onchange={handleRatingChange}>
+            </lightning-input>
+            <lightning-input
+                type="date"
+                label="Watch Date"
+                value={watchDate}
+                onchange={handleWatchDateChange}>
+            </lightning-input>
+            <lightning-textarea
+                label="My Review"
+                value={myReview}
+                placeholder="Write your thoughts..."
+                onchange={handleReviewChange}>
+            </lightning-textarea>
+        </div>
+
+        <!-- ── Actions ── -->
+        <div class="actions">
+            <lightning-button label="Save Log"      variant="brand"       onclick={handleSave}>      </lightning-button>
+            <lightning-button label="🤖 AI Summary" variant="neutral"     onclick={handleAISummary}> </lightning-button>
+            <lightning-button label="Delete"        variant="destructive" onclick={handleDelete}>    </lightning-button>
+        </div>
+
+        <!-- ── AI Summary ── -->
+        <template if:true={movie.AI_Summary__c}>
+            <div class="ai-box">
+                <div class="ai-label">🤖 Gemini Insight</div>
+                <p class="ai-text">{movie.AI_Summary__c}</p>
+            </div>
+        </template>
+
+        <!-- ── My Review Display ── -->
+        <template if:true={movie.My_Review__c}>
+            <div class="review-box">
+                <div class="review-label">📝 My Review</div>
+                <p class="review-text">{movie.My_Review__c}</p>
+            </div>
+        </template>
+
+    </div>
+</template>

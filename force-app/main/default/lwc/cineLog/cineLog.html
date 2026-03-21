@@ -1,0 +1,336 @@
+<template>
+    <div class="cinelog-root">
+
+        <!-- ── Navbar ── -->
+        <!-- ── Mobile Header (top) ── -->
+<div class="mobile-header">🎬 CineLog</div>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+    <div class="nav-logo">🎬 CineLog</div>
+    <div class="nav-tabs">
+        <button class={homeTabClass}    data-tab="home"      onclick={handleTabClick}>🏠 Home</button>
+        <button class={moviesTabClass}  data-tab="movies"    onclick={handleTabClick}>🎬 Movies</button>
+        <button class={tvTabClass}      data-tab="tv"        onclick={handleTabClick}>📺 TV</button>
+        <button class={dashTabClass}    data-tab="dashboard" onclick={handleTabClick}>📊 Stats</button>
+        <button class={searchTabClass}  data-tab="search"    onclick={handleTabClick}>🔍 Search</button>
+    </div>
+    <div class="nav-ai-btn" onclick={handleAIChatOpen}>
+    🤖 <span class="ai-btn-label">AI</span>
+</div>
+</nav>
+            <!-- <div class="nav-right">
+                <button class={searchTabClass} data-tab="search" onclick={handleTabClick}>
+                    🔍 Search
+                </button>
+            </div> -->
+        
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- HOME / MOVIES / TV SHOWS VIEW             -->
+        <!-- ══════════════════════════════════════════ -->
+        <template if:true={isLibraryView}>
+            <div class="library-view">
+
+                <!-- Watching Row -->
+                <template if:true={watchingList.length}>
+                    <div class="shelf">
+                        <div class="shelf-header">
+                            <span class="shelf-dot watching-dot"></span>
+                            Continue Watching
+                        </div>
+                        <div class="shelf-track">
+                            <template for:each={watchingList} for:item="movie">
+                                <div key={movie.Id} class="poster-wrap" data-id={movie.Id} onclick={handlePosterClick}>
+                                    <img src={movie.posterSrc} alt={movie.Title__c} class="poster-img" />
+                                    <div class="poster-overlay">
+                                        <div class="overlay-title">{movie.Title__c}</div>
+                                        <div class={movie.ratingClass}>{movie.My_Rating__c}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Want to Watch Row -->
+                <template if:true={wantToWatchList.length}>
+                    <div class="shelf">
+                        <div class="shelf-header">
+                            <span class="shelf-dot want-dot"></span>
+                            Want to Watch
+                        </div>
+                        <div class="shelf-track">
+                            <template for:each={wantToWatchList} for:item="movie">
+                                <div key={movie.Id} class="poster-wrap" data-id={movie.Id} onclick={handlePosterClick}>
+                                    <img src={movie.posterSrc} alt={movie.Title__c} class="poster-img" />
+                                    <div class="poster-overlay">
+                                        <div class="overlay-title">{movie.Title__c}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Watched Row -->
+                <template if:true={watchedList.length}>
+                    <div class="shelf">
+                        <div class="shelf-header">
+                            <span class="shelf-dot watched-dot"></span>
+                            Watched
+                        </div>
+                        <div class="shelf-track">
+                            <template for:each={watchedList} for:item="movie">
+                                <div key={movie.Id} class="poster-wrap" data-id={movie.Id} onclick={handlePosterClick}>
+                                    <img src={movie.posterSrc} alt={movie.Title__c} class="poster-img" />
+                                    <div class="poster-overlay">
+                                        <div class="overlay-title">{movie.Title__c}</div>
+                                        <div class={movie.ratingClass}>{movie.My_Rating__c}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Dropped Row -->
+                <template if:true={droppedList.length}>
+                    <div class="shelf">
+                        <div class="shelf-header">
+                            <span class="shelf-dot dropped-dot"></span>
+                            Dropped
+                        </div>
+                        <div class="shelf-track">
+                            <template for:each={droppedList} for:item="movie">
+                                <div key={movie.Id} class="poster-wrap" data-id={movie.Id} onclick={handlePosterClick}>
+                                    <img src={movie.posterSrc} alt={movie.Title__c} class="poster-img" />
+                                    <div class="poster-overlay">
+                                        <div class="overlay-title">{movie.Title__c}</div>
+                                        <div class={movie.ratingClass}>{movie.My_Rating__c}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Empty State -->
+                <template if:true={isLibraryEmpty}>
+                    <div class="empty-library">
+                        <div class="empty-icon">🎬</div>
+                        <div class="empty-title">Your library is empty</div>
+                        <div class="empty-sub">Search for movies and shows to get started</div>
+                        <button class="cta-btn" data-tab="search" onclick={handleTabClick}>
+                            🔍 Search Now
+                        </button>
+                    </div>
+                </template>
+
+            </div>
+        </template>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- SEARCH VIEW                               -->
+        <!-- ══════════════════════════════════════════ -->
+        <template if:true={isSearchView}>
+            <div class="search-view">
+                <div class="search-bar-wrap">
+                    <div class="search-type-toggle">
+                        <button class={movieSearchClass} data-type="Movie"   onclick={handleSearchTypeToggle}>🎬 Movies</button>
+                        <button class={tvSearchClass}    data-type="TV Show" onclick={handleSearchTypeToggle}>📺 TV Shows</button>
+                    </div>
+                    <div class="search-input-wrap">
+                        <input
+                            type="text"
+                            class="search-input"
+                            placeholder={searchPlaceholder}
+                            value={searchQuery}
+                            onkeyup={handleSearchKeyUp}
+                            oninput={handleSearchInput} />
+                        <button class="search-go-btn" onclick={handleSearch}>Search</button>
+                    </div>
+                </div>
+
+                <!-- Spinner -->
+                <template if:true={isSearching}>
+                    <div class="spinner-wrap">
+                        <div class="spinner"></div>
+                    </div>
+                </template>
+
+                <!-- Results Grid -->
+                <template if:true={hasSearchResults}>
+                    <div class="search-results-grid">
+                        <template for:each={searchResults} for:item="result">
+                            <div key={result.tmdbId} class="search-poster-wrap" data-tmdbid={result.tmdbId} onclick={handleSearchPosterClick}>
+                                <img src={result.posterSrc} alt={result.title} class="search-poster-img" />
+                                <div class="search-poster-overlay">
+                                    <div class="overlay-title">{result.title}</div>
+                                    <div class="overlay-year">{result.releaseDate}</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- No Results -->
+                <template if:true={showNoResults}>
+                    <div class="empty-library">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">No results found</div>
+                        <div class="empty-sub">Try a different title</div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- DASHBOARD VIEW (placeholder)              -->
+        <!-- ══════════════════════════════════════════ -->
+        <template if:true={isDashboardView}>
+    <div class="dashboard-view">
+
+        <!-- ── Quick Stats ── -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-number">{totalCount}</div>
+                <div class="stat-label">Total Logged</div>
+            </div>
+            <div class="stat-card watched-card">
+                <div class="stat-number">{watchedCount}</div>
+                <div class="stat-label">✅ Watched</div>
+            </div>
+            <div class="stat-card watching-card">
+                <div class="stat-number">{watchingCount}</div>
+                <div class="stat-label">▶️ Watching</div>
+            </div>
+            <div class="stat-card backlog-card">
+                <div class="stat-number">{backlogCount}</div>
+                <div class="stat-label">🔖 Want to Watch</div>
+            </div>
+            <div class="stat-card dropped-card">
+                <div class="stat-number">{droppedCount}</div>
+                <div class="stat-label">❌ Dropped</div>
+            </div>
+        </div>
+
+        <!-- ── Middle Row ── -->
+        <div class="dash-mid-row">
+
+            <!-- Movies vs TV -->
+            <div class="dash-panel">
+                <div class="panel-title">🎬 Movies vs 📺 TV Shows</div>
+                <div class="type-bar-wrap">
+                    <div class="type-bar-row">
+                        <span class="type-bar-label">🎬 Movies</span>
+                        <div class="type-bar-track">
+                            <div class="type-bar-fill movie-fill" style={movieBarStyle}></div>
+                        </div>
+                        <span class="type-bar-count">{movieCount}</span>
+                    </div>
+                    <div class="type-bar-row">
+                        <span class="type-bar-label">📺 TV Shows</span>
+                        <div class="type-bar-track">
+                            <div class="type-bar-fill tv-fill" style={tvBarStyle}></div>
+                        </div>
+                        <span class="type-bar-count">{tvCount}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Breakdown -->
+            <div class="dash-panel">
+                <div class="panel-title">⭐ Rating Breakdown</div>
+                <div class="rating-bars">
+                    <template for:each={ratingBars} for:item="bar">
+                        <div key={bar.label} class="rating-bar-row">
+                            <span class="rating-bar-label">{bar.label}</span>
+                            <div class="rating-bar-track">
+                                <div class="rating-bar-fill" style={bar.fillStyle}></div>
+                            </div>
+                            <span class="rating-bar-count">{bar.count}</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Genre Breakdown ── -->
+        <!-- <template if:true={sortedGenreList.length}>
+    <div class="dash-panel full-width">
+        <div class="panel-title">🎪 Top Genres</div>
+        <div class="genre-pills-grid">
+            <template for:each={sortedGenreList} for:item="genre">
+                <div key={genre.name} class="genre-stat-card">
+                    <div class="genre-stat-count">{genre.count}</div>
+                    <div class="genre-stat-name">{genre.name}</div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template> -->
+
+        <!-- ── Recently Watched ── -->
+        <template if:true={recentList.length}>
+            <div class="shelf">
+                <div class="shelf-header">
+                    <span class="shelf-dot watched-dot"></span>
+                    Recently Watched
+                </div>
+                <div class="shelf-track">
+                    <template for:each={recentList} for:item="movie">
+                        <div key={movie.id} class="poster-wrap" data-id={movie.id} onclick={handleDashboardPosterClick}>
+                            <img src={movie.posterSrc} alt={movie.title} class="poster-img" />
+                            <div class="poster-overlay">
+                                <div class="overlay-title">{movie.title}</div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- ── Rating Shelves ── -->
+        <template for:each={ratingShelfRows} for:item="shelf">
+            <div key={shelf.key} class="shelf">
+                <div class="shelf-header">
+                    <span class="shelf-dot" style={shelf.dotStyle}></span>
+                    {shelf.label}
+                </div>
+                <div class="shelf-track">
+                    <template for:each={shelf.list} for:item="movie">
+                        <div key={movie.id} class="poster-wrap" data-id={movie.id} onclick={handleDashboardPosterClick}>
+                            <img src={movie.posterSrc} alt={movie.title} class="poster-img" />
+                            <div class="poster-overlay">
+                                <div class="overlay-title">{movie.title}</div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+    </div>
+</template>
+
+        <!-- ── Detail Modal (placeholder for Session 14) ── -->
+        <!-- ── Detail Modal ── -->
+<template if:true={isDetailOpen}>
+    <c-cine-log-modal
+        saved-movie={selectedSavedMovie}
+        search-result={selectedSearchResult}
+        onclose={handleDetailClose}
+        onsaved={handleModalSaved}
+        ondeleted={handleModalDeleted}>
+    </c-cine-log-modal>
+</template>
+<!-- ── AI Chat ── -->
+<template if:true={isAIChatOpen}>
+    <c-cine-log-a-i-chat
+        onclose={handleAIChatClose}>
+    </c-cine-log-a-i-chat>
+</template>
+    </div>
+</template>

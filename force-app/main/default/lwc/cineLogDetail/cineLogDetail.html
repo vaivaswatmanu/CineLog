@@ -1,0 +1,107 @@
+<template>
+    <template if:true={isOpen}>
+        <div class="overlay" onclick={handleOverlayClick}>
+            <div class="detail-panel" onclick={stopPropagation}>
+
+                <!-- ── Close Button ── -->
+                <button class="close-btn" onclick={handleClose}>✕</button>
+
+                <!-- ── Backdrop / Poster ── -->
+                <div class="backdrop">
+                    <template if:true={movie.Poster_URL__c}>
+                        <img src={movie.Poster_URL__c} alt={movie.Title__c} class="backdrop-img" />
+                    </template>
+                    <div class="backdrop-overlay">
+                        <div class="detail-title">{movie.Title__c}</div>
+                        <div class="detail-meta">
+                            <span class="type-badge">{movie.Type__c}</span>
+                            <span>{movie.Release_Date__c}</span>
+                            <span>⭐ {movie.TMDB_Rating__c}</span>
+                        </div>
+                        <div class="detail-genres">{movie.Genres__c}</div>
+                    </div>
+                </div>
+
+                <!-- ── TV Show Info ── -->
+                <template if:true={isTVShow}>
+                    <div class="tv-info">
+                        <div class="tv-stat">
+                            <span class="tv-stat-label">Seasons</span>
+                            <span class="tv-stat-value">{movie.Number_of_Seasons__c}</span>
+                        </div>
+                        <div class="tv-stat">
+                            <span class="tv-stat-label">Episodes</span>
+                            <span class="tv-stat-value">{movie.Number_of_Episodes__c}</span>
+                        </div>
+                        <div class="tv-stat">
+                            <span class="tv-stat-label">Show Status</span>
+                            <span class="tv-stat-value">{movie.Show_Status__c}</span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ── Overview ── -->
+                <div class="detail-section">
+                    <div class="section-label">Overview</div>
+                    <p class="detail-overview">{movie.Overview__c}</p>
+                </div>
+
+                <!-- ── My Log ── -->
+                <div class="detail-section">
+                    <div class="section-label">My Log</div>
+                    <div class="log-grid">
+                        <lightning-combobox
+                            label="Status"
+                            value={status}
+                            options={statusOptions}
+                            onchange={handleStatusChange}>
+                        </lightning-combobox>
+                        <lightning-input
+                            type="number"
+                            label="My Rating (0–10)"
+                            min="0" max="10" step="0.5"
+                            value={myRating}
+                            onchange={handleRatingChange}>
+                        </lightning-input>
+                        <lightning-input
+                            type="date"
+                            label="Watch Date"
+                            value={watchDate}
+                            onchange={handleWatchDateChange}>
+                        </lightning-input>
+                        <lightning-textarea
+                            label="My Review"
+                            value={myReview}
+                            placeholder="Write your thoughts..."
+                            onchange={handleReviewChange}>
+                        </lightning-textarea>
+                    </div>
+                </div>
+
+                <!-- ── Actions ── -->
+                <div class="detail-actions">
+                    <lightning-button label="Save Log"      variant="brand"       onclick={handleSave}>      </lightning-button>
+                    <lightning-button label="🤖 AI Summary" variant="neutral"     onclick={handleAISummary}> </lightning-button>
+                    <lightning-button label="Delete"        variant="destructive" onclick={handleDelete}>    </lightning-button>
+                </div>
+
+                <!-- ── AI Summary ── -->
+                <template if:true={movie.AI_Summary__c}>
+                    <div class="detail-section">
+                        <div class="section-label">🤖 Gemini Insight</div>
+                        <p class="ai-text">{movie.AI_Summary__c}</p>
+                    </div>
+                </template>
+
+                <!-- ── My Review Display ── -->
+                <template if:true={movie.My_Review__c}>
+                    <div class="detail-section">
+                        <div class="section-label">📝 My Review</div>
+                        <p class="review-text">{movie.My_Review__c}</p>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </template>
+</template>

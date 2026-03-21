@@ -1,0 +1,191 @@
+<template>
+    <div class="modal-overlay" onclick={handleOverlayClick}>
+        <div class="modal-panel" onclick={stopProp}>
+
+            <!-- ── Close ── -->
+            <button class="close-btn" onclick={handleClose}>✕</button>
+
+            <!-- ── Loading State ── -->
+            <template if:true={isLoading}>
+                <div class="loading-wrap">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Loading details...</p>
+                </div>
+            </template>
+
+            <!-- ── Content ── -->
+            <template if:false={isLoading}>
+
+                <!-- ── Backdrop ── -->
+                <div class="backdrop" style={backdropStyle}>
+                    <div class="backdrop-blur"></div>
+                    <div class="backdrop-content">
+                        <img src={posterSrc} alt={title} class="modal-poster" />
+                        <!-- Custom Poster Input (shows when no poster) -->
+<template if:true={showPosterInput}>
+    <div class="poster-input-wrap">
+        <input
+            type="url"
+            class="poster-input"
+            placeholder="Paste poster URL..."
+            value={customPosterURL}
+            oninput={handlePosterInput} />
+    </div>
+</template>
+                        <div class="modal-header-info">
+                            <div class="modal-type-badge">{typeLabel}</div>
+                            <div class="modal-title">{title}</div>
+                            <div class="modal-quick-info">
+                                <template if:true={director}>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Directed By</span>
+                                        <span class="qi-value">{director}</span>
+                                    </div>
+                                </template>
+                                <template if:true={year}>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Year</span>
+                                        <span class="qi-value">{year}</span>
+                                    </div>
+                                </template>
+                                <template if:true={runtimeLabel}>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Runtime</span>
+                                        <span class="qi-value">{runtimeLabel}</span>
+                                    </div>
+                                </template>
+                                <template if:true={language}>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Language</span>
+                                        <span class="qi-value">{language}</span>
+                                    </div>
+                                </template>
+                                <template if:true={isTVShow}>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Seasons</span>
+                                        <span class="qi-value">{numberOfSeasons}</span>
+                                    </div>
+                                    <div class="quick-info-item">
+                                        <span class="qi-label">Episodes</span>
+                                        <span class="qi-value">{numberOfEpisodes}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Body ── -->
+                <div class="modal-body">
+
+                    <!-- ── Left Column ── -->
+                    <div class="modal-left">
+
+                        <!-- Genre Pills -->
+                        <template if:true={hasGenres}>
+                            <div class="genre-pills">
+                                <template for:each={genreList} for:item="genre">
+                                    <span key={genre} class="genre-pill">{genre}</span>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- Overview -->
+                        <div class="section-block">
+                            <div class="section-label">Overview</div>
+                            <p class="overview-text">{overview}</p>
+                        </div>
+
+                        <!-- Cast -->
+                        <template if:true={hasCast}>
+                            <div class="section-block">
+                                <div class="section-label">Cast</div>
+                                <div class="cast-list">
+                                    <template for:each={castList} for:item="actor">
+                                        <span key={actor} class="cast-pill">{actor}</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                    </div>
+
+                    <!-- ── Right Column ── -->
+                    <div class="modal-right">
+
+                        <!-- Status Selector -->
+                        <div class="section-block">
+    <div class="section-label">My Status</div>
+
+    <!-- Selected / Trigger Button -->
+    <button class={selectedStatusOption.btnClass} onclick={handleStatusExpand}>
+        {selectedStatusOption.icon} {selectedStatusOption.label}
+        <span class="dropdown-arrow">{isStatusExpanded ? '▲' : '▼'}</span>
+    </button>
+
+    <!-- Dropdown Options -->
+    <template if:true={showStatusDropdown}>
+        <div class="dropdown-list">
+            <template for:each={statusOptions} for:item="opt">
+                <button
+                    key={opt.value}
+                    class={opt.btnClass}
+                    data-value={opt.value}
+                    onclick={handleStatusClick}>
+                    {opt.icon} {opt.label}
+                </button>
+            </template>
+        </div>
+    </template>
+</div>
+                        <!-- Rating (only if Watched) -->
+                        <template if:true={isWatched}>
+    <div class="section-block">
+        <div class="section-label">My Rating</div>
+
+        <!-- Selected / Trigger Button -->
+        <button class={selectedRatingOption.btnClass} onclick={handleRatingExpand}>
+            {selectedRatingOption.icon} {selectedRatingOption.label}
+            <span class="dropdown-arrow">{isRatingExpanded ? '▲' : '▼'}</span>
+        </button>
+
+        <!-- Dropdown Options -->
+        <template if:true={showRatingDropdown}>
+            <div class="dropdown-list">
+                <template for:each={ratingOptions} for:item="opt">
+                    <button
+                        key={opt.value}
+                        class={opt.btnClass}
+                        data-value={opt.value}
+                        onclick={handleRatingClick}>
+                        {opt.icon} {opt.label}
+                    </button>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>
+
+                        <!-- Save / Delete buttons -->
+                        <div class="modal-actions">
+                            <template if:true={isSaving}>
+                                <div class="btn-spinner"></div>
+                            </template>
+                            <template if:false={isSaving}>
+                                <button class="save-btn" onclick={handleSave}>
+                                    {saveLabel}
+                                </button>
+                                <template if:true={isSaved}>
+                                    <button class="delete-btn" onclick={handleDelete}>
+                                        Remove from List
+                                    </button>
+                                </template>
+                            </template>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

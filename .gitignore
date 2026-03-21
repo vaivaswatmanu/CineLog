@@ -1,0 +1,19 @@
+# Salesforce
+.sfdx/
+.sf/
+*.dup
+
+# VS Code
+.vscode/settings.json
+
+# Node
+node_modules/
+npm-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensitive — never push these
+**/namedCredentials/
+**/customMetadata/CineLog_Config*
