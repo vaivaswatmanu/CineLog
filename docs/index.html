@@ -3,419 +3,744 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineLog — Personal Movie & TV Tracker</title>
+    <title>CineLog — Track What Moves You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg:        #080808;
+            --surface:   #111111;
+            --border:    #1e1e1e;
+            --amber:     #D4A853;
+            --amber-dim: #8a6a30;
+            --white:     #F0EDE8;
+            --muted:     #5a5a5a;
+            --mid:       #2a2a2a;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background: #0A0A0F;
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-height: 100vh;
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            overflow-x: hidden;
         }
 
-        /* ── Hero ── */
-        .hero {
-            text-align: center;
-            padding: 60px 20px 40px;
-            background: radial-gradient(ellipse at top, #1a0a2e 0%, #0A0A0F 70%);
+        /* ── Grain overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
         }
 
-        .logo {
-            font-size: 3rem;
-            margin-bottom: 8px;
-        }
-
-        .hero h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #7C3AED, #C4B5FD);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: #9CA3AF;
-            max-width: 500px;
-            margin: 0 auto 32px;
-            line-height: 1.6;
-        }
-
-        .badge-row {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .badge {
-            background: #1F1F2E;
-            border: 1px solid #2D2D3E;
-            color: #9CA3AF;
-            font-size: 0.78rem;
-            padding: 5px 12px;
-            border-radius: 20px;
-        }
-
-        /* ── Demo Box ── */
-        .demo-box {
-            background: #13131A;
-            border: 1px solid #2D2D3E;
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 480px;
-            margin: 0 auto 60px;
-            box-shadow: 0 0 60px rgba(124,58,237,0.15);
-        }
-
-        .demo-box h2 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #7C3AED;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
-
-        .credential-row {
+        /* ── Nav ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            padding: 24px 48px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1F1F2E;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
+            background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
         }
 
-        .cred-label {
-            font-size: 0.75rem;
-            color: #6B7280;
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            color: var(--amber);
+        }
+
+        .nav-links { display: flex; gap: 32px; }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: color 0.3s;
         }
 
-        .cred-value {
+        .nav-links a:hover { color: var(--white); }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 48px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 70% 40%, rgba(212,168,83,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 20% 60%, rgba(255,255,255,0.02) 0%, transparent 60%);
+        }
+
+        /* Decorative film strip lines */
+        .hero-lines {
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--border), transparent);
+        }
+
+        .hero-eyebrow {
+            font-size: 0.72rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.2s forwards;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.5rem, 9vw, 8rem);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            max-width: 800px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.4s forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--amber);
+        }
+
+        .hero-sub {
+            margin-top: 28px;
+            font-size: 1rem;
+            color: var(--muted);
+            max-width: 420px;
+            line-height: 1.7;
+            font-weight: 300;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+
+        .hero-cta-row {
+            margin-top: 44px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.8s forwards;
+        }
+
+        .btn-primary {
+            background: var(--amber);
+            color: #080808;
+            border: none;
+            padding: 14px 32px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #e8bc6a;
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            color: var(--muted);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .btn-ghost:hover { color: var(--white); border-color: var(--muted); }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            right: 48px;
+            writing-mode: vertical-rl;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.2s forwards;
+        }
+
+        .hero-scroll::after {
+            content: '';
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--muted), transparent);
+        }
+
+        /* ── Marquee ── */
+        .marquee-wrap {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            padding: 14px 0;
+            background: var(--surface);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 0;
+            animation: marquee 20s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-item {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 0 40px;
+            white-space: nowrap;
+            border-right: 1px solid var(--border);
+        }
+
+        .marquee-item span { color: var(--amber); margin-right: 10px; }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        /* ── Credentials ── */
+        .credentials-section {
+            padding: 100px 48px;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .section-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 16px;
+        }
+
+        .cred-headline {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .cred-body {
             font-size: 0.9rem;
-            font-weight: 600;
-            color: #E5E7EB;
-            font-family: monospace;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .login-note {
+            background: rgba(212,168,83,0.06);
+            border-left: 2px solid var(--amber);
+            padding: 14px 18px;
+            font-size: 0.8rem;
+            color: #a07a3a;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .login-note strong { color: var(--amber); }
+
+        .cred-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+        }
+
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cred-row:last-of-type { border-bottom: none; }
+
+        .cred-key {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .cred-val {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem;
+            color: var(--white);
+            font-weight: 400;
         }
 
         .copy-btn {
-            background: #2D2D3E;
-            border: none;
-            color: #9CA3AF;
-            padding: 4px 10px;
-            border-radius: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 6px 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 0.75rem;
             transition: all 0.2s;
         }
 
-        .copy-btn:hover { background: #7C3AED; color: #fff; }
+        .copy-btn:hover { border-color: var(--amber); color: var(--amber); }
+        .copy-btn.copied { border-color: #4ade80; color: #4ade80; }
 
-        .demo-btn {
+        .demo-link {
             display: block;
-            width: 100%;
-            background: linear-gradient(135deg, #7C3AED, #4F46E5);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
+            background: var(--amber);
+            color: #080808;
+            text-align: center;
             padding: 16px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             text-decoration: none;
-            text-align: center;
-            margin-top: 20px;
-            transition: opacity 0.2s, transform 0.2s;
+            margin-top: 24px;
+            transition: background 0.3s;
         }
 
-        .demo-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
-        .demo-note {
-            font-size: 0.75rem;
-            color: #4B5563;
-            text-align: center;
-            margin-top: 12px;
-        }
+        .demo-link:hover { background: #e8bc6a; }
 
         /* ── Features ── */
-        .features {
-            max-width: 900px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
+        .features-section {
+            padding: 100px 48px;
+            border-top: 1px solid var(--border);
         }
 
-        .features h2 {
-            text-align: center;
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 32px;
+        .features-header {
+            max-width: 1100px;
+            margin: 0 auto 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-        }
-
-        .feature-card {
-            background: #13131A;
-            border: 1px solid #1F1F2E;
-            border-radius: 14px;
-            padding: 20px;
-            transition: border-color 0.2s, transform 0.2s;
-        }
-
-        .feature-card:hover {
-            border-color: #7C3AED;
-            transform: translateY(-3px);
-        }
-
-        .feature-icon { font-size: 1.8rem; margin-bottom: 10px; }
-
-        .feature-title {
-            font-size: 0.95rem;
+        .features-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
             font-weight: 700;
-            color: #fff;
-            margin-bottom: 6px;
+            color: var(--white);
+            max-width: 400px;
+            line-height: 1.1;
         }
 
-        .feature-desc {
-            font-size: 0.82rem;
-            color: #6B7280;
-            line-height: 1.5;
+        .features-desc {
+            font-size: 0.88rem;
+            color: var(--muted);
+            max-width: 300px;
+            line-height: 1.8;
+            text-align: right;
         }
 
-        /* ── Tech Stack ── */
-        .tech-stack {
-            max-width: 900px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
+        .features-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid var(--border);
         }
 
-        .tech-stack h2 {
-            text-align: center;
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 32px;
+        .feature-item {
+            padding: 40px 36px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
         }
 
-        .tech-grid {
+        .feature-item:hover { background: rgba(212,168,83,0.03); }
+
+        .feature-item:nth-child(3n) { border-right: none; }
+        .feature-item:nth-child(n+4) { border-bottom: none; }
+
+        .feature-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--border);
+            line-height: 1;
+            margin-bottom: 24px;
+            transition: color 0.3s;
+        }
+
+        .feature-item:hover .feature-num { color: var(--mid); }
+
+        .feature-name {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--white);
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+        }
+
+        .feature-text {
+            font-size: 0.83rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ── Tech ── */
+        .tech-section {
+            padding: 80px 48px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .tech-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .tech-left .section-label { margin-bottom: 12px; }
+
+        .tech-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .tech-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .tech-pill {
-            background: #1F1F2E;
-            border: 1px solid #2D2D3E;
-            border-radius: 12px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
 
-        .tech-pill span:first-child { font-size: 1.2rem; }
-
-        .tech-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #E5E7EB;
+        .tech-pill {
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            text-transform: uppercase;
+            transition: all 0.2s;
         }
 
-        .tech-desc {
-            font-size: 0.72rem;
-            color: #6B7280;
-        }
+        .tech-pill:hover { border-color: var(--amber-dim); color: var(--amber); }
 
         /* ── Footer ── */
-        .footer {
-            text-align: center;
-            padding: 32px 20px;
-            border-top: 1px solid #1F1F2E;
-            color: #4B5563;
-            font-size: 0.82rem;
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .footer a {
-            color: #7C3AED;
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--amber);
+            letter-spacing: 0.1em;
+        }
+
+        .footer-links { display: flex; gap: 24px; }
+
+        .footer-links a {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
             text-decoration: none;
+            transition: color 0.2s;
         }
 
-        .footer a:hover { text-decoration: underline; }
+        .footer-links a:hover { color: var(--white); }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
 
         /* ── Mobile ── */
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 2rem; }
-            .demo-box { margin: 0 16px 40px; padding: 24px; }
-            .feature-grid { grid-template-columns: 1fr; }
+        @media (max-width: 768px) {
+            nav { padding: 20px 24px; }
+            .nav-links { display: none; }
+
+            .hero { padding: 0 24px 60px; }
+            .hero-title { font-size: clamp(2.8rem, 12vw, 4rem); }
+            .hero-scroll { display: none; }
+
+            .credentials-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 60px 24px;
+            }
+
+            .features-section { padding: 60px 24px; }
+            .features-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .features-desc { text-align: left; }
+            .features-grid { grid-template-columns: 1fr; }
+            .feature-item { border-right: none; }
+            .feature-item:nth-child(n+4) { border-bottom: 1px solid var(--border); }
+            .feature-item:last-child { border-bottom: none; }
+
+            .tech-section { padding: 60px 24px; }
+            .tech-inner { flex-direction: column; align-items: flex-start; }
+
+            footer { flex-direction: column; gap: 16px; padding: 24px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ── Nav ── -->
+    <nav>
+        <div class="nav-logo">CineLog</div>
+        <div class="nav-links">
+            <a href="#demo">Demo</a>
+            <a href="#features">Features</a>
+            <a href="https://github.com/vaivaswatmanu/CineLog" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
     <!-- ── Hero ── -->
-    <div class="hero">
-        <div class="logo">🎬</div>
-        <h1>CineLog</h1>
-        <p>A personal movie & TV tracker built on Salesforce — search, rate, and get AI-powered suggestions.</p>
-        <div class="badge-row">
-            <span class="badge">⚡ Salesforce LWC</span>
-            <span class="badge">🎬 TMDB API</span>
-            <span class="badge">🤖 Gemini AI</span>
-            <span class="badge">📱 Mobile Responsive</span>
-            <span class="badge">☁️ Experience Cloud</span>
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-lines"></div>
+
+        <div class="hero-eyebrow">Personal Movie Tracker — Salesforce LWC</div>
+        <h1 class="hero-title">Track what<br><em>moves</em> you.</h1>
+        <p class="hero-sub">
+            A cinephile's tool built on Salesforce. Search any movie or show,
+            build your watchlist, rate with personality, and let AI
+            tell you what to watch next.
+        </p>
+        <div class="hero-cta-row">
+            <a href="#demo" class="btn-primary">Try the Demo</a>
+            <a href="https://github.com/vaivaswatmanu/CineLog" target="_blank" class="btn-ghost">View Source</a>
         </div>
 
-        <!-- ── Demo Credentials Box ── -->
-        <div class="demo-box">
-            <h2>🔑 Demo Access</h2>
+        <div class="hero-scroll">Scroll</div>
+    </section>
 
-            <div class="credential-row">
-                <div>
-                    <div class="cred-label">Username</div>
-                    <div class="cred-value" id="username">vaivaswatmanu0047@gmail.com</div>
-                </div>
-                <button class="copy-btn" onclick="copyText('username')">Copy</button>
-            </div>
-
-            <div class="credential-row">
-                <div>
-                    <div class="cred-label">Password</div>
-                    <div class="cred-value" id="password">Demo@1234</div>
-                </div>
-                <button class="copy-btn" onclick="copyText('password')">Copy</button>
-            </div>
-
-            <a class="demo-btn"
-            href="https://orgfarm-b782f2a9bf-dev-ed.develop.my.site.com/CineLog/login?loginType=Employee"
-               target="_blank">
-                ▶ Open Live Demo
-            </a>
-            <p class="demo-note">
-                💡 Copy credentials above before clicking — paste them on the login page
-            </p>
+    <!-- ── Marquee ── -->
+    <div class="marquee-wrap">
+        <div class="marquee-track">
+            <div class="marquee-item"><span>—</span> Salesforce LWC</div>
+            <div class="marquee-item"><span>—</span> TMDB API</div>
+            <div class="marquee-item"><span>—</span> Gemini 2.5 Flash</div>
+            <div class="marquee-item"><span>—</span> Experience Cloud</div>
+            <div class="marquee-item"><span>—</span> Apex Backend</div>
+            <div class="marquee-item"><span>—</span> Mobile Responsive</div>
+            <div class="marquee-item"><span>—</span> AI Chat Advisor</div>
+            <div class="marquee-item"><span>—</span> Salesforce LWC</div>
+            <div class="marquee-item"><span>—</span> TMDB API</div>
+            <div class="marquee-item"><span>—</span> Gemini 2.5 Flash</div>
+            <div class="marquee-item"><span>—</span> Experience Cloud</div>
+            <div class="marquee-item"><span>—</span> Apex Backend</div>
+            <div class="marquee-item"><span>—</span> Mobile Responsive</div>
+            <div class="marquee-item"><span>—</span> AI Chat Advisor</div>
         </div>
     </div>
+
+    <!-- ── Demo / Credentials ── -->
+    <section class="credentials-section" id="demo">
+        <div>
+            <div class="section-label">Live Demo</div>
+            <h2 class="cred-headline">See it running.<br>Right now.</h2>
+            <p class="cred-body">
+                The app is live on Salesforce Experience Cloud.
+                Use the credentials to log in and explore — add movies,
+                rate them, ask the AI what to watch, check your dashboard.
+            </p>
+            <div class="login-note">
+                On the login page, click <strong>"Are you an employee? Log in"</strong>
+                and use the credentials below.
+            </div>
+        </div>
+
+        <div class="cred-card">
+            <div class="section-label">Access Credentials</div>
+
+            <div class="cred-row">
+                <div>
+                    <div class="cred-key">Username</div>
+                    <div class="cred-val" id="username">vaivaswatmanu0047@gmail.com</div>
+                </div>
+                <button class="copy-btn" onclick="copyField('username', this)">Copy</button>
+            </div>
+
+            <div class="cred-row">
+                <div>
+                    <div class="cred-key">Password</div>
+                    <div class="cred-val" id="password">Demo@1234</div>
+                </div>
+                <button class="copy-btn" onclick="copyField('password', this)">Copy</button>
+            </div>
+
+            <a class="demo-link"
+               href="https://orgfarm-b782f2a9bf-dev-ed.develop.my.site.com/CineLog"
+               target="_blank">
+                Open Live Demo
+            </a>
+        </div>
+    </section>
 
     <!-- ── Features ── -->
-    <div class="features">
-        <h2>✨ Features</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <div class="feature-title">Smart Search</div>
-                <div class="feature-desc">Search millions of movies and TV shows via TMDB API with instant results.</div>
+    <section class="features-section" id="features">
+        <div class="features-header">
+            <h2 class="features-title">Built for how you actually watch.</h2>
+            <p class="features-desc">Every detail designed around the way a real person tracks, rates, and rediscovers films.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-num">01</div>
+                <div class="feature-name">Search & Discover</div>
+                <div class="feature-text">Live search across millions of titles via TMDB. Director, cast, runtime — all pulled automatically.</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📺</div>
-                <div class="feature-title">Netflix-style UI</div>
-                <div class="feature-desc">Dark themed horizontal shelves organised by status — just like your favourite streaming app.</div>
+            <div class="feature-item">
+                <div class="feature-num">02</div>
+                <div class="feature-name">Shelf View</div>
+                <div class="feature-text">Your library organised into horizontal shelves by status. Watching, want to watch, watched, dropped — at a glance.</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🐐</div>
-                <div class="feature-title">Personality Ratings</div>
-                <div class="feature-desc">Rate with GOAT, Perfection, Good, Timepass or Disaster — because stars don't capture feelings.</div>
+            <div class="feature-item">
+                <div class="feature-num">03</div>
+                <div class="feature-name">Personality Ratings</div>
+                <div class="feature-text">GOAT. Perfection. Good. Timepass. Disaster. Because a star rating has never told the full story.</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <div class="feature-title">AI Movie Advisor</div>
-                <div class="feature-desc">Chat with Gemini AI that knows your watchlist and gives personalised recommendations.</div>
+            <div class="feature-item">
+                <div class="feature-num">04</div>
+                <div class="feature-name">AI Chat Advisor</div>
+                <div class="feature-text">Gemini reads your entire watchlist and taste profile. Ask it anything — mood, genre, director, vibe.</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <div class="feature-title">Personal Dashboard</div>
-                <div class="feature-desc">Stats, genre breakdown, rating distribution and curated shelves from your watch history.</div>
+            <div class="feature-item">
+                <div class="feature-num">05</div>
+                <div class="feature-name">Personal Dashboard</div>
+                <div class="feature-text">Your watch stats, genre breakdown, rating distribution, and curated shelves — all in one view.</div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <div class="feature-title">Mobile First</div>
-                <div class="feature-desc">Fully responsive with a bottom tab navigation — built to be used on your phone daily.</div>
+            <div class="feature-item">
+                <div class="feature-num">06</div>
+                <div class="feature-name">Mobile First</div>
+                <div class="feature-text">Bottom tab navigation, slide-up modals, swipeable shelves. Built to live on your phone.</div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- ── Tech Stack ── -->
-    <div class="tech-stack">
-        <h2>🛠️ Built With</h2>
-        <div class="tech-grid">
-            <div class="tech-pill">
-                <span>⚡</span>
-                <div>
-                    <div class="tech-name">Salesforce LWC</div>
-                    <div class="tech-desc">Frontend components</div>
-                </div>
+    <section class="tech-section">
+        <div class="tech-inner">
+            <div class="tech-left">
+                <div class="section-label">Tech Stack</div>
+                <div class="tech-title">Enterprise tech.<br>Real-world project.</div>
             </div>
-            <div class="tech-pill">
-                <span>☁️</span>
-                <div>
-                    <div class="tech-name">Apex</div>
-                    <div class="tech-desc">Backend logic</div>
-                </div>
-            </div>
-            <div class="tech-pill">
-                <span>🌐</span>
-                <div>
-                    <div class="tech-name">Experience Cloud</div>
-                    <div class="tech-desc">Public site hosting</div>
-                </div>
-            </div>
-            <div class="tech-pill">
-                <span>🎬</span>
-                <div>
-                    <div class="tech-name">TMDB API</div>
-                    <div class="tech-desc">Movie & TV data</div>
-                </div>
-            </div>
-            <div class="tech-pill">
-                <span>🤖</span>
-                <div>
-                    <div class="tech-name">Gemini 2.5 Flash</div>
-                    <div class="tech-desc">AI suggestions</div>
-                </div>
+            <div class="tech-pills">
+                <div class="tech-pill">Salesforce LWC</div>
+                <div class="tech-pill">Apex</div>
+                <div class="tech-pill">Experience Cloud</div>
+                <div class="tech-pill">SOQL</div>
+                <div class="tech-pill">TMDB REST API</div>
+                <div class="tech-pill">Google Gemini AI</div>
+                <div class="tech-pill">Named Credentials</div>
+                <div class="tech-pill">Custom Metadata</div>
+                <div class="tech-pill">CSS3 Animations</div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- ── Footer ── -->
-    <div class="footer">
-        <p>
-            Built by <a href="https://github.com/vaivaswatmanu" target="_blank">Vaivaswat Manu</a>
-            &nbsp;·&nbsp;
-            <a href="https://github.com/vaivaswatmanu/CineLog" target="_blank">View on GitHub</a>
-        </p>
-    </div>
+    <footer>
+        <div class="footer-logo">CineLog</div>
+        <div class="footer-links">
+            <a href="https://github.com/vaivaswatmanu/CineLog" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/vaivaswatmanu" target="_blank">LinkedIn</a>
+            <a href="#demo">Demo</a>
+        </div>
+    </footer>
 
     <script>
-        function copyText(id) {
+        function copyField(id, btn) {
             const text = document.getElementById(id).innerText;
             navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target;
-                btn.innerText = 'Copied!';
-                btn.style.background = '#10B981';
-                btn.style.color = '#fff';
+                btn.innerText = 'Copied';
+                btn.classList.add('copied');
                 setTimeout(() => {
                     btn.innerText = 'Copy';
-                    btn.style.background = '';
-                    btn.style.color = '';
+                    btn.classList.remove('copied');
                 }, 2000);
             });
         }
+
+        // Subtle scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-item, .cred-card, .tech-pill').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(16px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
     </script>
 
 </body>
 </html>
-```
-
-
-
